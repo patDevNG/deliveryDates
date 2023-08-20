@@ -1,0 +1,11 @@
+exports.GREEN_DAY_OF_WEEK = 3;
+exports.GREEN_DAYS_OF_THE_MONTH = [5,15,25];
+exports.NUMBER_OF_DAYS_TO_CHECK = 14;
+exports.LAST_DAY_OF_THE_WEED = 6;
+exports.EXTERNAL_PRODUCT_DELIVERY_DAYS = 5;
+exports.EXTERNAL_PRODUCT_TYPE = 'external';
+exports.TEMPORARY_PRODUCT_TYPE = 'temporary';
+exports.DAY_CONVERTER = 86400000;
+exports.SORTING_DAYS = 3;
+
+
