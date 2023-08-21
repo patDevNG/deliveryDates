@@ -27,6 +27,21 @@ describe("availableDeliveryDates", () => {
     ).toThrowError("Products are required");
   });
 
+  it("should throw an error if the date is not provided", () => {
+    const products = [
+      {
+        productId: 1,
+        name: "Widget",
+        deliveryDays: [1, 2, 3, 4, 5],
+        productType: "external",
+        daysInAdvance: 3,
+      },
+    ];
+    expect(() => availableDeliveryDates(13756, products, null)).toThrowError(
+      "Date is required"
+    );
+  });
+
   it("should throw an error if the date is not a valid date", () => {
     const products = [
       {
@@ -39,7 +54,7 @@ describe("availableDeliveryDates", () => {
     ];
     expect(() =>
       availableDeliveryDates(13756, products, "2023-08-200")
-    ).toThrowError("Date is not valid");
+    ).toThrowError("The provided date is missing or invalid");
   });
 
   it("should should give a 5 day gap for external products", () => {

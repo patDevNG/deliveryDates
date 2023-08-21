@@ -40,32 +40,41 @@ const availableDeliveryDates = (postalCode, products, providedDate) => {
   if(!postalCode) throw new Error('Postal code is required');
   if(!products || !products.length) throw new Error('Products are required');
   if(!providedDate) throw new Error('Date is required');
-  if(isNaN(new Date(providedDate).getTime())) throw new Error('Date is not valid');
+  if(isNaN(new Date(providedDate).getTime())) throw new Error('The provided date is missing or invalid');
   for (let day = 0; day <  NUMBER_OF_DAYS_TO_CHECK; day++) {
     const date = new Date(providedDate);
       date.setDate(date.getDate() + day);
       let isDeliveryDayValid = true;
 
       for (let product of products) {
-          if ( product && !product.deliveryDays.includes(date.getDay())) {
+        const availableDeliveryDatesConditions = 
+        product && 
+          (!product.deliveryDays.includes(date.getDay()) ||
+          (product.productType === EXTERNAL_PRODUCT_TYPE && day < EXTERNAL_PRODUCT_DELIVERY_DAYS) ||
+          (product.productType === TEMPORARY_PRODUCT_TYPE && day > daysLeftInTheWeek(providedDate)) ||
+          day < product.daysInAdvance);
+          if ( availableDeliveryDatesConditions) {
               isDeliveryDayValid = false;
               break;
           }
-          const externalProductTypeCondition = product.productType === EXTERNAL_PRODUCT_TYPE && day < EXTERNAL_PRODUCT_DELIVERY_DAYS;
-          if (product && externalProductTypeCondition) {
-              isDeliveryDayValid = false;
-              break;
-          }
-          const temporaryProductTypeCondition = product.productType === TEMPORARY_PRODUCT_TYPE && day > daysLeftInTheWeek(providedDate);
-          if (product && temporaryProductTypeCondition) {
-              isDeliveryDayValid = false;
-              break;
-          }
+          // const externalProductTypeCondition = product.productType === EXTERNAL_PRODUCT_TYPE && day < EXTERNAL_PRODUCT_DELIVERY_DAYS;
+          // if (product && externalProductTypeCondition) {
+          //   console.log(`Product ${product.name},  (external) cannot be delivered until after day: ${EXTERNAL_PRODUCT_DELIVERY_DAYS}`);
+          //     isDeliveryDayValid = false;
+          //     break;
+          // }
+          // const temporaryProductTypeCondition = product.productType === TEMPORARY_PRODUCT_TYPE && day > daysLeftInTheWeek(providedDate);
+          // if (product && temporaryProductTypeCondition) {
+          //   console.log(day)
+          //   console.log(`Product ${product.name} (temporary) cannot be delivered until after day:" ${daysLeftInTheWeek(providedDate)}`);
+          //     isDeliveryDayValid = false;
+          //     break;
+          // }
 
-          if (day < product.daysInAdvance) {
-              isDeliveryDayValid = false;
-              break;
-          }
+          // if (day < product.daysInAdvance) {
+          //     isDeliveryDayValid = false;
+          //     break;
+          // }
       }
 
       if (isDeliveryDayValid) {
@@ -98,14 +107,14 @@ const products = [
   {
   productId: 1,
   name: 'Apple',
-  deliveryDays: [1, 2, 3, 4, 5], 
+  deliveryDays: [1, 2, 3, 4, 5,6,0], 
   productType: 'external',
   daysInAdvance: 3
 },
 {
   productId: 2,
   name: 'Banana',
-  deliveryDays: [1, 2, 3, 4, 5],
+  deliveryDays: [1, 2, 3, 4, 5,6,0],
   productType: 'temporary',
   daysInAdvance: 1
 },
