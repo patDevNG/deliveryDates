@@ -91,31 +91,31 @@ const availableDeliveryDates = (postalCode, products, providedDate) => {
   return sortDeliveryDates(deliveryDates, providedDate)
 }
 
-// const products = [
-//   {
-//   productId: 1,
-//   name: 'Apple',
-//   deliveryDays: [1, 2, 3, 4, 5,6,0], 
-//   productType: 'external',
-//   daysInAdvance: 3
-// },
-// {
-//   productId: 2,
-//   name: 'Banana',
-//   deliveryDays: [1, 2, 3, 4, 5,6,0],
-//   productType: 'temporary',
-//   daysInAdvance: 1
-// },
-// {
-//   productId: 3,
-//   name: 'Orange',
-//   deliveryDays: [1, 2, 3, 4, 5],
-//   productType: 'normal',
-// }
+const products = [
+  {
+  productId: 1,
+  name: 'Apple',
+  deliveryDays: [1, 2, 3, 4, 5,6,0], 
+  productType: 'external',
+  daysInAdvance: 3
+},
+{
+  productId: 2,
+  name: 'Banana',
+  deliveryDays: [1, 2, 3, 4, 5,6,0],
+  productType: 'temporary',
+  daysInAdvance: 1
+},
+{
+  productId: 3,
+  name: 'Orange',
+  deliveryDays: [1, 2, 3, 4, 5],
+  productType: 'normal',
+}
 
-// ];
-// const getDeliveryDates = availableDeliveryDates(14162, products, new Date('2023-08-21'));
-// console.log(getDeliveryDates, 'getDeliveryDates');
+];
+const getDeliveryDates = availableDeliveryDates(14162, products, new Date('2023-08-21'));
+console.log(getDeliveryDates, 'getDeliveryDates');
 module.exports = {
   availableDeliveryDates,
   isGreenDelivery,
