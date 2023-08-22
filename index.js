@@ -29,6 +29,26 @@ const daysLeftInTheWeek = (date) => {
 }
 
 /**
+ * description: returns an arrayh of sorted dates
+ * @param Array of delivery dates
+ * @returns Array of sorted delivery dates
+ */
+const sortDeliveryDates = (deliveryDates, providedDate) => {
+  return deliveryDates.sort((a, b) => {
+    const dayDifferenceA = (new Date(a.deliveryDate) - providedDate) / DAY_CONVERTER;
+    const dayDifferenceB = (new Date(b.deliveryDate) - providedDate) / DAY_CONVERTER;
+
+    if (a.isGreenDelivery && dayDifferenceA <= SORTING_DAYS && (!b.isGreenDelivery || dayDifferenceB > SORTING_DAYS)) {
+        return -1;
+    } else if (b.isGreenDelivery && dayDifferenceB <= SORTING_DAYS && (!a.isGreenDelivery || dayDifferenceA > SORTING_DAYS)) {
+        return 1;
+    } else {
+        return a.deliveryDate.localeCompare(b.deliveryDate);
+    }
+});
+}
+
+/**
  * 
  * @param {*} postalCode 
  * @param {*} products 
@@ -57,24 +77,6 @@ const availableDeliveryDates = (postalCode, products, providedDate) => {
               isDeliveryDayValid = false;
               break;
           }
-          // const externalProductTypeCondition = product.productType === EXTERNAL_PRODUCT_TYPE && day < EXTERNAL_PRODUCT_DELIVERY_DAYS;
-          // if (product && externalProductTypeCondition) {
-          //   console.log(`Product ${product.name},  (external) cannot be delivered until after day: ${EXTERNAL_PRODUCT_DELIVERY_DAYS}`);
-          //     isDeliveryDayValid = false;
-          //     break;
-          // }
-          // const temporaryProductTypeCondition = product.productType === TEMPORARY_PRODUCT_TYPE && day > daysLeftInTheWeek(providedDate);
-          // if (product && temporaryProductTypeCondition) {
-          //   console.log(day)
-          //   console.log(`Product ${product.name} (temporary) cannot be delivered until after day:" ${daysLeftInTheWeek(providedDate)}`);
-          //     isDeliveryDayValid = false;
-          //     break;
-          // }
-
-          // if (day < product.daysInAdvance) {
-          //     isDeliveryDayValid = false;
-          //     break;
-          // }
       }
 
       if (isDeliveryDayValid) {
@@ -86,50 +88,37 @@ const availableDeliveryDates = (postalCode, products, providedDate) => {
           deliveryDates.push(deliveryDate);
       }
   }
-
-  deliveryDates.sort((a, b) => {
-    const dayDifferenceA = (new Date(a.deliveryDate) - providedDate) / DAY_CONVERTER;
-    const dayDifferenceB = (new Date(b.deliveryDate) - providedDate) / DAY_CONVERTER;
-
-    if (a.isGreenDelivery && dayDifferenceA <= SORTING_DAYS && (!b.isGreenDelivery || dayDifferenceB > SORTING_DAYS)) {
-        return -1;
-    } else if (b.isGreenDelivery && dayDifferenceB <= SORTING_DAYS && (!a.isGreenDelivery || dayDifferenceA > SORTING_DAYS)) {
-        return 1;
-    } else {
-        return a.deliveryDate.localeCompare(b.deliveryDate);
-    }
-});
-
-  return deliveryDates;
+  return sortDeliveryDates(deliveryDates, providedDate)
 }
 
-const products = [
-  {
-  productId: 1,
-  name: 'Apple',
-  deliveryDays: [1, 2, 3, 4, 5,6,0], 
-  productType: 'external',
-  daysInAdvance: 3
-},
-{
-  productId: 2,
-  name: 'Banana',
-  deliveryDays: [1, 2, 3, 4, 5,6,0],
-  productType: 'temporary',
-  daysInAdvance: 1
-},
-{
-  productId: 3,
-  name: 'Orange',
-  deliveryDays: [1, 2, 3, 4, 5],
-  productType: 'normal',
-}
+// const products = [
+//   {
+//   productId: 1,
+//   name: 'Apple',
+//   deliveryDays: [1, 2, 3, 4, 5,6,0], 
+//   productType: 'external',
+//   daysInAdvance: 3
+// },
+// {
+//   productId: 2,
+//   name: 'Banana',
+//   deliveryDays: [1, 2, 3, 4, 5,6,0],
+//   productType: 'temporary',
+//   daysInAdvance: 1
+// },
+// {
+//   productId: 3,
+//   name: 'Orange',
+//   deliveryDays: [1, 2, 3, 4, 5],
+//   productType: 'normal',
+// }
 
-];
-const getDeliveryDates = availableDeliveryDates(14162, products, new Date('2023-08-21'));
-console.log(getDeliveryDates, 'getDeliveryDates');
+// ];
+// const getDeliveryDates = availableDeliveryDates(14162, products, new Date('2023-08-21'));
+// console.log(getDeliveryDates, 'getDeliveryDates');
 module.exports = {
   availableDeliveryDates,
   isGreenDelivery,
-  daysLeftInTheWeek
+  daysLeftInTheWeek,
+  sortDeliveryDates
 }

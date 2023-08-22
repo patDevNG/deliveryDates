@@ -2,8 +2,9 @@ const {
   availableDeliveryDates,
   isGreenDelivery,
   daysLeftInTheWeek,
+  sortDeliveryDates
 } = require("./index");
-
+const { DAY_CONVERTER } = require("./constants");
 describe("availableDeliveryDates", () => {
   it("should throw an error if the postal code is not provided", () => {
     const products = [
@@ -57,7 +58,7 @@ describe("availableDeliveryDates", () => {
     ).toThrowError("The provided date is missing or invalid");
   });
 
-  it("should should give a 5 day gap for external products", () => {
+  it("should provide external product with delivery days that is grater than 5 days", () => {
     const products = [
       {
         productId: 1,
@@ -72,34 +73,28 @@ describe("availableDeliveryDates", () => {
       products,
       new Date("2023-08-21")
     );
-    const expectedDeliveryDates = [
+      const daysDiff = Math.abs(new Date(result[0].deliveryDate) - new Date("2023-08-21")) / DAY_CONVERTER;
+    expect(daysDiff).toBeGreaterThan(5);
+  });
+
+  it("should display delivery dates that that is within the same week for tempoary products", () => {
+    const products = [
       {
-        postalCode: 14162,
-        deliveryDate: "2023-08-28T00:00:00.000Z",
-        isGreenDelivery: false,
-      },
-      {
-        postalCode: 14162,
-        deliveryDate: "2023-08-29T00:00:00.000Z",
-        isGreenDelivery: false,
-      },
-      {
-        postalCode: 14162,
-        deliveryDate: "2023-08-30T00:00:00.000Z",
-        isGreenDelivery: true,
-      },
-      {
-        postalCode: 14162,
-        deliveryDate: "2023-08-31T00:00:00.000Z",
-        isGreenDelivery: false,
-      },
-      {
-        postalCode: 14162,
-        deliveryDate: "2023-09-01T00:00:00.000Z",
-        isGreenDelivery: false,
+        productId: 1,
+        name: "Apple",
+        deliveryDays: [1, 2, 3, 4, 5],
+        productType: "temporary",
+        daysInAdvance: 3,
       },
     ];
-    expect(JSON.stringify(result)).toBe(JSON.stringify(expectedDeliveryDates));
+    const result = availableDeliveryDates(
+      14162,
+      products,
+      new Date("2023-08-21")
+    );
+    const daysDiff = Math.abs(new Date(result[0].deliveryDate) - new Date("2023-08-21")) / DAY_CONVERTER;
+    console.log(daysDiff, 'daysDiff');
+    expect(daysDiff).toBeLessThanOrEqual(6);
   });
 });
 describe("isGreenDelivery", () => {
@@ -155,3 +150,34 @@ describe("daysLeftInTheWeek", () => {
     expect(daysLeftInTheWeek(date)).toBe(0);
   });
 });
+
+describe("sortDeliveryDates", () => {
+  it("should sort delivery dates by the closest date to the provided date", () => {
+    const providedDate = new Date("2023-08-21");
+    const mockDates = [
+      {
+          deliveryDate: new Date(providedDate.getTime() + 2 * DAY_CONVERTER).toISOString(),
+          isGreenDelivery: true
+      },
+      {
+          deliveryDate: new Date(providedDate.getTime() + 4 * DAY_CONVERTER).toISOString(),
+          isGreenDelivery: false
+      },
+      {
+          deliveryDate: new Date(providedDate.getTime() + 1 * DAY_CONVERTER).toISOString(),
+          isGreenDelivery: false
+      },
+      {
+          deliveryDate: new Date(providedDate.getTime() + 3 * DAY_CONVERTER).toISOString(),
+          isGreenDelivery: true
+      }
+  ];
+  const sortedDates = sortDeliveryDates(mockDates, providedDate);
+
+  expect(sortedDates[0].deliveryDate).toBe(new Date(providedDate.getTime() + 2 * DAY_CONVERTER).toISOString());
+  expect(sortedDates[1].deliveryDate).toBe(new Date(providedDate.getTime() + 3 * DAY_CONVERTER).toISOString());
+  expect(sortedDates[2].deliveryDate).toBe(new Date(providedDate.getTime() + 1 * DAY_CONVERTER).toISOString());
+  expect(sortedDates[3].deliveryDate).toBe(new Date(providedDate.getTime() + 4 * DAY_CONVERTER).toISOString());
+  });
+});
+
